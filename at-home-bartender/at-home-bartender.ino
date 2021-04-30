@@ -261,7 +261,7 @@ int autoQuestions() { //questions are exclusive of their relative answers. They 
   lcd.clear();
 
   //tallies all the responses
-  int totalSum = answerOne + answerTwo + answerThree + answerFour;
+  int totalSum = answerOne + answerTwo + answerThree + answerFour + answer_five;
 
   int size_drink; //holds the data to be passed from function
 

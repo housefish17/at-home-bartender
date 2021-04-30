@@ -1,3 +1,17 @@
+/*
+ * These questions (currently five total), all operate similarly so I will
+ * explain only once. 
+ * 
+ * Each question begins with a clear screen and setting the answer variable
+ * to an arbitrary int that is not one of the response values. The LCD then
+ * displays a question with a series of acceptable replies. An arrow is under each
+ * reply (with the exception of the "final in a one credit class" question, due to 
+ * space restraints) which indicate which button should be pressed to select that 
+ * response. The loop will continue until the user selects a response, which
+ * changes the value of the variable that is fueling the do-while. These answers
+ * are returned answer variables found in the autoQuestions() function where they 
+ * are tallied. 
+ */
 int questionOne() {
   lcd.clear();
   int answer = 100;

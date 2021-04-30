@@ -26,7 +26,7 @@ const int LARGE_DRINK = 100;
 
 //button setups
 const int buttonPins[] = {2, 3, 4};
-int buttonAmount = (sizeof(buttonPins) / sizeof(buttonPins[0]));
+int buttonAmount = (sizeof(buttonPins) / sizeof(buttonPins[0])); //calculates the number of buttons
 
 //solenoid pin
 const int solenoidPin = 9;
@@ -38,7 +38,7 @@ char line_three[21];
 char line_four[21];
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600); //opens serial monitor
 
   //scale initialization
   scale.begin(LOADCELL_DOUT_PIN, LOADCELL_SCK_PIN);
@@ -92,6 +92,7 @@ void loop() {
 
   do {
 
+    //prompts user for mode selection, automatic or manual
     delay(1000);
     lcd.setCursor(0, 0);
     lcd.print("Select a mode");
@@ -110,8 +111,6 @@ void loop() {
       modeManual = 1;
     }
 
-
-
     //continues until a mode is selected
   } while (modeAutomatic == LOW && modeManual == LOW);
 
@@ -121,21 +120,21 @@ void loop() {
 
   do
   {
-    if (modeAutomatic == 1) {
+    if (modeAutomatic == 1) { //feeds back to user they selected auto mode
       lcd.setCursor(0, 0);
       lcd.print("Automatic Mode");
 
       sizeDrink = autoQuestions(); //begins the question function.
     }
 
-    else if (modeManual == 1) {
+    else if (modeManual == 1) { //feeds back to user they selected manual mode
 
       lcd.setCursor(0, 0);
       lcd.print("Manual Mode");
       delay(2000);
       lcd.clear();
 
-      do {
+      do {  //prompts user to select a drink size (remember this is manual mode
 
         lcd.setCursor(0, 0);
         lcd.print("Select size drink");
@@ -148,6 +147,7 @@ void loop() {
         lcd.setCursor(17, 3);
         lcd.write(byte(0));
 
+        //determines which button pressed by user, selects drink size as result
         if (digitalRead(buttonPins[0]) == HIGH) {
           sizeDrink = SMALL_DRINK;
         }
@@ -157,20 +157,21 @@ void loop() {
         else if (digitalRead(buttonPins[2]) == HIGH) {
           sizeDrink = LARGE_DRINK;
         }
-
+      //loop continues while size of drink doesn't change
       } while (sizeDrink == 0);
     }
   } while (sizeDrink == 0); //end of drink sizing
 
-  pourDrink(sizeDrink);
+  pourDrink(sizeDrink); //starts the pour function, passes size to function
 
+  //after drink pour is completed, Lemuel prompts user to enjoy drink
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("Enjoy your drink!");
   delay(3000);
   lcd.clear();
 
-  do {
+  do {  //a less jarring way to return to the beginning of the program
     lcd.setCursor(0, 0);
     lcd.print("Press any key...");
   } while (digitalRead(buttonPins[0]) == LOW && digitalRead(buttonPins[1]) == LOW
@@ -183,10 +184,15 @@ void loop() {
 //While the solenoid pin is energized, the LCD displays "pouring your drink"
 void pourDrink(int size)
 {
+  //holds the percentage of the pour completed
   unsigned int percent_complete;
 
+  //stores string of drink size
   String drink_size;
-  
+
+  //determines word for drink size based on size passed to function
+  //this is used to feed back to the user what size drink they are
+  //receiving. 
   if(size == 25){
     drink_size = String("small");
   }
@@ -199,13 +205,19 @@ void pourDrink(int size)
 
   lcd.clear();
 
+  //zeros the scale 
   delay(1000);
   scale.tare();
 
+  //loop runs while current weight is less than selected size
   while ((scale.get_units() * 1000) <= size)
   {
+    //shows user how far along the pour is
     percent_complete = ((scale.get_units() * 1000) / size) * 100;
 
+    //sends string to line_four buffer, allows better formatting without
+    //having to constantly clear screen. This is useful for displaying
+    //continuously updating information, such as percentage complete
     sprintf(line_four, "Progress: %02d%%", percent_complete);
 
     lcd.setCursor(0, 0);
@@ -213,15 +225,18 @@ void pourDrink(int size)
     lcd.setCursor(0,1);
     lcd.print(drink_size + " drink");
     lcd.setCursor(0, 3);
-    lcd.print(line_four);
-    digitalWrite(solenoidPin, HIGH);
+    lcd.print(line_four); //prints what is stored in line_four buffer
+    digitalWrite(solenoidPin, HIGH); //operates the solenoid open
   }
 
-  digitalWrite(solenoidPin, LOW);
+  digitalWrite(solenoidPin, LOW); //closes the solenoid once pour is complete
 
   return;
 }
 
+/*
+ * 
+ */
 int autoQuestions() { //questions are exclusive of their relative answers. They are numbered in order of creation.
   delay(1000);
 
@@ -248,7 +263,7 @@ int autoQuestions() { //questions are exclusive of their relative answers. They 
   //tallies all the responses
   int totalSum = answerOne + answerTwo + answerThree + answerFour;
 
-  int size_drink;
+  int size_drink; //holds the data to be passed from function
 
   //if total sum is <= 15, the program locks in a small drink
   if (totalSum <= 15) {
